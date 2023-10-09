@@ -11,12 +11,19 @@ Class {
 }
 
 { #category : 'examples' }
+DBBSMarkSuite class >> benchmarkOperations [
+	"Answer a <Collection> of <Symbol> representing each a selector which implements a benchmark operation "
+	
+	^ DBBenchmarksObject selectors select: [ : selector | selector beginsWith: #bench ]
+]
+
+{ #category : 'examples' }
 DBBSMarkSuite class >> benchmarkParameters [
 
 	| parameterMatrix |
 	parameterMatrix := super benchmarkParameters.
 	parameterMatrix
-		forSelector: #benchmarkOperation addOptions: DBBenchmarksObject selectors.
+		forSelector: #benchmarkOperation addOptions: self benchmarkOperations.
 	^ parameterMatrix
 ]
 
@@ -24,8 +31,32 @@ DBBSMarkSuite class >> benchmarkParameters [
 DBBSMarkSuite class >> example [
 
 	CSVSMarkHarness run: { 
-	    'SoilSMarkHarness'. 
-	    'SoilSMarkSuite.benchAll' . 
+	    'DBBSoilSMarkHarness'. 
+	    'DBBSMarkSuite.benchAll' . 
+	    1 . "The number of iterations"
+	    1 . "The number of processes"
+	    5   "The problem size"
+	    }.
+]
+
+{ #category : 'examples' }
+DBBSMarkSuite class >> exampleRead [
+
+	CSVSMarkHarness run: { 
+	    'DBBSoilSMarkHarness'. 
+	    'DBBSoilSMarkSuite.benchRead' . 
+	    1 . "The number of iterations"
+	    1 . "The number of processes"
+	    5   "The problem size"
+	    }.
+]
+
+{ #category : 'examples' }
+DBBSMarkSuite class >> exampleWrite [
+
+	CSVSMarkHarness run: { 
+	    'DBBSoilSMarkHarness'. 
+	    'DBBSoilSMarkSuite.benchWrite' . 
 	    1 . "The number of iterations"
 	    1 . "The number of processes"
 	    5   "The problem size"
@@ -46,4 +77,11 @@ DBBSMarkSuite >> setUp [
 
 	super setUp.
 	dbbObject := DBBenchmarksObject new.
+]
+
+{ #category : 'running' }
+DBBSMarkSuite >> tearDown [ 
+
+	dbbObject close.
+	super tearDown.
 ]

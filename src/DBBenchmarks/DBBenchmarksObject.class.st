@@ -1,17 +1,54 @@
+"
+Prefix each benchmark selector with ""bench"" so it can be included as part of the suite to benchmark.
+"
 Class {
 	#name : 'DBBenchmarksObject',
 	#superclass : 'Object',
 	#instVars : [
 		'db',
 		'txn',
-		'root'
+		'root',
+		'databaseName'
 	],
 	#category : 'DBBenchmarks',
 	#package : 'DBBenchmarks'
 }
 
 { #category : 'benchmarking' }
-DBBenchmarksObject >> benchCommitOneThousandElementArray [
+DBBenchmarksObject >> benchCommitOneHundredOfSmallIntegersAtATime [
+
+	[
+		db open.
+		txn := db newTransaction.
+		txn root: (Array new: 100).
+		1 to: 100 do: [ : index |
+			txn at: index put: index.
+			txn commit ].
+	] ensure: [ db close ].
+]
+
+{ #category : 'benchmarking' }
+DBBenchmarksObject >> benchCommitOneHundredOfSmallIntegersTenAtATime [
+
+	[
+		db open.
+		txn := db newTransaction.
+		txn root: (Array new: 100).
+		1 to: 10 do: [ : index |
+			1 to: 10 do: [ : innerIndex | 
+				txn at: innerIndex put: innerIndex ].
+			txn commit ].
+	] ensure: [ db close ].
+]
+
+{ #category : 'benchmarking' }
+DBBenchmarksObject >> benchCommitOneMillionObjectPointerCommit [
+
+	^ self shouldBeImplemented
+]
+
+{ #category : 'benchmarking' }
+DBBenchmarksObject >> benchCommitOneThousandSmallIntegerElementArrayAtOnce [
 
 	txn := db newTransaction.
 	root := txn root: (1 to: 100) asArray.
@@ -19,12 +56,16 @@ DBBenchmarksObject >> benchCommitOneThousandElementArray [
 ]
 
 { #category : 'benchmarking' }
-DBBenchmarksObject >> benchCommitThousandsOfObjectsAtOnce [
+DBBenchmarksObject >> benchCommitThousandsOfSmallIntegerOneHundredAtATime [
 
-	self newDatabase.
-	txn := db newTransaction.
-	root := txn root: (1 to: 100) asArray.
-	txn commit
+	[
+		db open.
+		txn := db newTransaction.
+		txn root: (Array new: 100).
+		1 to: 100 do: [ : index |
+			txn at: index put: index.
+			txn commit ].
+	] ensure: [ db close ].
 ]
 
 { #category : 'benchmarking' }
@@ -55,34 +96,34 @@ DBBenchmarksObject >> benchReadOneThousandLevelsDeepRead [
 { #category : 'benchmarking' }
 DBBenchmarksObject >> benchReadSingleObject [
 
-	self newDatabase.
 	txn := db newTransaction.
 	root := txn root: Object new.
 	txn commit
 ]
 
-{ #category : 'benchmarking' }
-DBBenchmarksObject >> benchWriteThousandsOfObjectsOneHundredAtATime [
-
-	^ self shouldBeImplemented
-]
-
-{ #category : 'benchmarking' }
-DBBenchmarksObject >> benchWriteThousandsOfObjectsTenAtATime [
-
-	^ self shouldBeImplemented
-]
-
-{ #category : 'benchmarking' }
-DBBenchmarksObject >> benchWriteaOneMillionObjectPointerCommit [
-
-	^ self shouldBeImplemented
-]
-
 { #category : 'instance creation' }
 DBBenchmarksObject >> databaseName [
 
-	^ 'soil-prueba'
+	^ databaseName
+		ifNil: [ databaseName := 'soil-' , UUID new asString36 ]
+]
+
+{ #category : 'accessing' }
+DBBenchmarksObject >> databaseName: anObject [
+
+	databaseName := anObject
+]
+
+{ #category : 'accessing' }
+DBBenchmarksObject >> db [
+
+	^ db
+]
+
+{ #category : 'accessing' }
+DBBenchmarksObject >> db: anObject [
+
+	db := anObject
 ]
 
 { #category : 'initialization' }
@@ -101,4 +142,28 @@ DBBenchmarksObject >> newDatabase [
 	    destroy;
 	    initializeFilesystem.
 
+]
+
+{ #category : 'accessing' }
+DBBenchmarksObject >> root [
+
+	^ root
+]
+
+{ #category : 'accessing' }
+DBBenchmarksObject >> root: anObject [
+
+	root := anObject
+]
+
+{ #category : 'accessing' }
+DBBenchmarksObject >> txn [
+
+	^ txn
+]
+
+{ #category : 'accessing' }
+DBBenchmarksObject >> txn: anObject [
+
+	txn := anObject
 ]
